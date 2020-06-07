@@ -1,10 +1,10 @@
 package logic;
 
 
+import model.MoveResult;
 import model.MoveType;
 import model.CheckerType;
 import view.Checker;
-
 
 
 import static logic.ModalWindow.modalWindowResult;
@@ -15,6 +15,11 @@ class GameController {
     public static boolean turn = true;
     private static int xKilled;
     private static int yKilled;
+    private static int turns = 0;
+    private static int turnsWithStainsB = 0;
+    private static int turnsWithStainsW = 0;
+    private static int turnsWith3checkersB = 0;
+    private static int turnsWith3checkersW = 0;
 
 
     //адаптация координат
@@ -49,6 +54,7 @@ class GameController {
                         checker.move(newX, newY);
                         board[x0][y0].setChecker(null);
                         board[newX][newY].setChecker(checker);
+                        checkWin();
                         turn = !turn;
                         player.setText((turn) ? "WHITE" : "BLACK");
                         break;
@@ -60,6 +66,7 @@ class GameController {
                         board[onBoard(otherChecker.getOldX())][onBoard(otherChecker.getOldY())].setChecker(null);
                         checkerGroup.getChildren().remove(otherChecker);
                         if (checkForKill(checker, newX, newY) == 0) {
+                            checkWin();
                             turn = !turn;
                             player.setText((turn) ? "WHITE" : "BLACK");
                         }
@@ -67,7 +74,7 @@ class GameController {
                 }
             } else
                 // При постановке на дамочное поле
-                if (newY == 7  || newY == 0 ) {
+                if (newY == 7 || newY == 0) {
                     switch (result.getType()) {
                         case NONE:
                             checker.abortMove();
@@ -84,8 +91,10 @@ class GameController {
                                 checker.setType(CheckerType.BLACKSTAIN);
                             }
                             board[newX][newY].setChecker(checker);
+                            checkWin();
                             turn = !turn;
                             player.setText((turn) ? "WHITE" : "BLACK");
+
                             break;
                         case KILL:
                             checker.move(newX, newY);
@@ -103,14 +112,13 @@ class GameController {
                             board[onBoard(otherChecker.getOldX())][onBoard(otherChecker.getOldY())].setChecker(null);
                             checkerGroup.getChildren().remove(otherChecker);
                             if (checkForKill(checker, newX, newY) == 0) {
+                                checkWin();
                                 turn = !turn;
                                 player.setText((turn) ? "WHITE" : "BLACK");
                             }
                             break;
                     }
                 }
-            // Проверка на выполнение условия победы
-            checkWin();
         });
         return checker;
     }
@@ -119,10 +127,6 @@ class GameController {
     private static MoveResult tryMove(Checker checker, int newX, int newY) {
         int x0 = onBoard(checker.getOldX());
         int y0 = onBoard(checker.getOldY());
-        System.out.println(x0 );
-        System.out.println(y0);
-        System.out.println(newX);
-        System.out.println(newY);
 
         if (turn) {
             if (checker.getType() == CheckerType.BLACK || checker.getType() == CheckerType.BLACKSTAIN)
@@ -137,8 +141,9 @@ class GameController {
             return new MoveResult(MoveType.KILL);
         else if (checkForKill(checker, newX, newY) == 2)
             return new MoveResult(MoveType.NONE);
-        else if (checkAllForKill(checker))
+        else if (checkAllForKill(checker)) {
             return new MoveResult(MoveType.NONE);
+        }
         else {
 
             if (checker.getType() == CheckerType.BLACK) {
@@ -147,7 +152,8 @@ class GameController {
             } else if (checker.getType() == CheckerType.WHITE) {
                 if (Math.abs(newX - x0) != 1 || newY > y0)
                     return new MoveResult(MoveType.NONE);
-            } if (board[newX][newY].hasChecker())
+            }
+            if (board[newX][newY].hasChecker())
                 return new MoveResult(MoveType.NONE);
 
             else {
@@ -295,7 +301,7 @@ class GameController {
         //Пешка бьет
         if (isMustKill && isTryKill)
             return 1;
-        //Пешка должна бить
+            //Пешка должна бить
         else if (isMustKill)
             return 2;
         //Пешка не бьет
@@ -356,10 +362,11 @@ class GameController {
     private static boolean checkAllForKill(Checker activeChecker) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-
                 if (board[i][j].getChecker() != null && board[i][j].getChecker() != activeChecker) {
-                    if (board[i][j].getChecker().getType() == activeChecker.getType() && checkForKill(board[i][j].getChecker(), 0, 0) == 2)
-                        return true;
+                    if ((turn && (board[i][j].getChecker().getType() == CheckerType.WHITE || board[i][j].getChecker().getType() == CheckerType.WHITESTAIN)) ||
+                            (!turn && (board[i][j].getChecker().getType() == CheckerType.BLACK || board[i][j].getChecker().getType() == CheckerType.BLACKSTAIN)))
+                        if (checkForKill(board[i][j].getChecker(), 0, 0) == 2)
+                            return true;
 
                 }
             }
@@ -373,17 +380,47 @@ class GameController {
         int black = 0;
         int white = 0;
         Checker checker;
+        int blackStain = 0;
+        int whiteStain = 0;
 
         while (i < checkerGroup.getChildren().size()) {
             checker = (Checker) checkerGroup.getChildren().get(i);
+            if (checker.getType() == CheckerType.BLACKSTAIN)
+                blackStain++;
+            if (checker.getType() == CheckerType.WHITESTAIN)
+                whiteStain++;
 
-            if (checker.getType() == CheckerType.BLACK || checker.getType() == CheckerType.BLACKSTAIN)
+            if (checker.getType() == CheckerType.BLACK)
                 black++;
-            else
+            else if (checker.getType() == CheckerType.WHITE)
                 white++;
             i++;
         }
-        if (black == 0 || white == 0) {
+
+        if (blackStain > 2 && white == 0 && whiteStain == 1 && !turn)
+            turnsWithStainsB++;
+        else if (whiteStain == 0 || blackStain <3)
+            turnsWithStainsB = 0;
+
+        if(whiteStain > 2 && black == 0 && blackStain == 1 && turn)
+            turnsWithStainsW++;
+        else if (blackStain == 0 || whiteStain <3)
+            turnsWithStainsW = 0;
+
+        if (((((blackStain == 3 && black == 0)|| (blackStain == 2 && black == 1) || (blackStain == 1 && black == 2) || (blackStain == 0 && black == 3)) && whiteStain == 1 && white == 0) && !turn))
+            turnsWith3checkersB++;
+        else if (black + blackStain != 0 && white + whiteStain != 0)
+            turnsWith3checkersB = 0;
+         if ((((whiteStain == 3 && white == 0) || (whiteStain == 2 && white == 1) || (whiteStain == 1 && white == 2) || (whiteStain == 0 && white == 3)) && blackStain == 1 && black == 0) && turn)
+            turnsWith3checkersW++;
+         else if (black + blackStain != 0 && white + whiteStain != 0)
+             turnsWith3checkersW = 0;
+
+
+        if (turnsWithStainsB == 16 || turnsWith3checkersB == 6 || turnsWithStainsW == 16 || turnsWith3checkersW == 6)
+            modalWindowResult(true);
+
+        if (black + blackStain == 0 || white + whiteStain == 0) {
             modalWindowResult(false);
         }
     }

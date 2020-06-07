@@ -68,7 +68,7 @@ public class Main extends Application {
         giveUp.setLayoutX(800);
         giveUp.setLayoutY(400);
         giveUp.setFont(Font.font(60));
-        giveUp.setOnMouseClicked(event -> ModalWindow.modalWindow("Do you agree to give?", false));
+        giveUp.setOnMouseClicked(event -> ModalWindow.modalWindow("Do you agree to give up?", false));
         root.getChildren().add(giveUp);
 
         return root;

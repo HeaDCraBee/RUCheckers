@@ -1,23 +1,18 @@
-package logic;
+package model;
 
-import model.MoveType;
 import view.Checker;
 
 public class MoveResult {
 
-    private MoveType type;
+    public MoveType type;
 
-    MoveType getType() {
+    public MoveType getType() {
         return type;
     }
 
-    private Checker checker;
+    public Checker checker;
 
-    Checker getChecker() {
-        return checker;
-    }
-
-    MoveResult(MoveType type) {
+    public MoveResult(MoveType type) {
         this(type, null);
     }
 
