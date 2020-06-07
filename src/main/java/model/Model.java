@@ -12,8 +12,6 @@ public class Model {
     public static final int WIDTH = 8;
     public static final int HEIGHT = 8;
 
-    public static Tile[][] board = new Tile[WIDTH][HEIGHT];
-
     public static Group tileGroup = new Group();
     public static Group checkerGroup = new Group();
     public static Label player = new Label("WHITE");

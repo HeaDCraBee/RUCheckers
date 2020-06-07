@@ -17,7 +17,10 @@ import static logic.GameController.makeChecker;
 import static model.Model.*;
 
 
+
 public class Main extends Application {
+
+    public static Tile[][] board = new Tile[WIDTH][HEIGHT];
 
     //Построение сцены
     public Parent createScene() {
@@ -49,25 +52,26 @@ public class Main extends Application {
 
         Label label = new Label("TURN");
         label.setFont(Font.font(40));
-        label.setLayoutX(895);
+        label.setLayoutX(900);
         root.getChildren().add(label);
 
-        player.setLayoutX(860);
+        player.setLayoutX(870);
         player.setLayoutY(100);
         player.setFont(Font.font(60));
         player.setAlignment(Pos.CENTER);
         root.getChildren().add(player);
 
-        draw.setLayoutX(800);
+        draw.setLayoutX(810);
         draw.setLayoutY(250);
         draw.setFont(Font.font(60));
-        draw.setMinSize(289, 10);
+        draw.setMinSize(292, 10);
         draw.setOnMouseClicked(event -> ModalWindow.modalWindow("Do you agree to a draw?", true));
         root.getChildren().add(draw);
 
-        giveUp.setLayoutX(800);
+        giveUp.setLayoutX(810);
         giveUp.setLayoutY(400);
         giveUp.setFont(Font.font(60));
+        giveUp.setMinWidth(292);
         giveUp.setOnMouseClicked(event -> ModalWindow.modalWindow("Do you agree to give up?", false));
         root.getChildren().add(giveUp);
 
@@ -79,6 +83,7 @@ public class Main extends Application {
         Scene scene = new Scene(createScene());
         primaryStage.setTitle("RUCheckers");
         primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 

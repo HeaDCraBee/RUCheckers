@@ -7,6 +7,7 @@ import model.CheckerType;
 import view.Checker;
 
 
+import static logic.Main.board;
 import static logic.ModalWindow.modalWindowResult;
 import static model.Model.*;
 
@@ -35,8 +36,10 @@ class GameController {
             int newX = onBoard(checker.getLayoutX());
             int newY = onBoard(checker.getLayoutY());
             MoveResult result;
-
-            if (newX < 0 || newY < 0 || newX > 8 || newY > 8) {
+            if (checker.getLayoutX() > 800 || checker.getLayoutY() > 700){
+                checker.abortMove();
+            }
+            if (newX < 0 || newY < 0 || newX > 7 || newY > 7) {
                 result = new MoveResult(MoveType.NONE);
             } else
                 result = tryMove(checker, newX, newY);
@@ -411,10 +414,10 @@ class GameController {
             turnsWith3checkersB++;
         else if (black + blackStain != 0 && white + whiteStain != 0)
             turnsWith3checkersB = 0;
-         if ((((whiteStain == 3 && white == 0) || (whiteStain == 2 && white == 1) || (whiteStain == 1 && white == 2) || (whiteStain == 0 && white == 3)) && blackStain == 1 && black == 0) && turn)
+        if ((((whiteStain == 3 && white == 0) || (whiteStain == 2 && white == 1) || (whiteStain == 1 && white == 2) || (whiteStain == 0 && white == 3)) && blackStain == 1 && black == 0) && turn)
             turnsWith3checkersW++;
-         else if (black + blackStain != 0 && white + whiteStain != 0)
-             turnsWith3checkersW = 0;
+        else if (black + blackStain != 0 && white + whiteStain != 0)
+            turnsWith3checkersW = 0;
 
 
         if (turnsWithStainsB == 16 || turnsWith3checkersB == 6 || turnsWithStainsW == 16 || turnsWith3checkersW == 6)

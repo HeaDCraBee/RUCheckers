@@ -17,7 +17,7 @@ import static logic.GameController.turn;
 
 public class ModalWindow {
 
-    //ќкно подтверждени€ сдачи или ничьей
+
     public static void modalWindow(String text, boolean draw) {
         AnchorPane root = new AnchorPane();
         root.setPrefSize(200, 90);
@@ -54,7 +54,6 @@ public class ModalWindow {
         window.show();
     }
 
-    //ќбъ€вление ничьей или победител€
     public static void modalWindowResult(boolean toDraw) {
         Stage window = new Stage();
         window.initModality(Modality.APPLICATION_MODAL);
@@ -69,7 +68,7 @@ public class ModalWindow {
 
         Label winner = new Label(turn ? "Black" : "White");
         winner.setFont(Font.font(40));
-        winner.setLayoutX(60);
+        winner.setLayoutX(turn ? 60:50);
         winner.setLayoutY(30);
 
         Label draw = new Label("DRAW");
