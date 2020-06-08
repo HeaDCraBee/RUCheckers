@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
@@ -20,10 +21,8 @@ import static model.Model.*;
 
 public class Main extends Application {
 
-    public static Tile[][] board = new Tile[WIDTH][HEIGHT];
-
     //Построение сцены
-    public Parent createScene() {
+    public static Parent createScene() {
         AnchorPane root = new AnchorPane();
         root.setPrefSize((WIDTH) * TILE_SIZE, (HEIGHT) * TILE_SIZE);
         root.getChildren().addAll(tileGroup, checkerGroup);
@@ -79,7 +78,7 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage){
         Scene scene = new Scene(createScene());
         primaryStage.setTitle("RUCheckers");
         primaryStage.setScene(scene);
@@ -88,6 +87,6 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        launch(args);
+        Application.launch(args);
     }
 }

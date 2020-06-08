@@ -15,6 +15,7 @@ public class Model {
     public static Group tileGroup = new Group();
     public static Group checkerGroup = new Group();
     public static Label player = new Label("WHITE");
+    public static Tile[][] board = new Tile[WIDTH][HEIGHT];
     public static Button draw = new Button("Draw");
     public static Button giveUp = new Button("Give Up");
 

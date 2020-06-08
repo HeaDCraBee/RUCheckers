@@ -7,7 +7,6 @@ import model.CheckerType;
 import view.Checker;
 
 
-import static logic.Main.board;
 import static logic.ModalWindow.modalWindowResult;
 import static model.Model.*;
 
