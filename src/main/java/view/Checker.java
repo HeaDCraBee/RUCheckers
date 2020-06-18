@@ -7,7 +7,6 @@ import javafx.scene.shape.Circle;
 import static model.Model.TILE_SIZE;
 
 
-
 public class Checker extends StackPane {
     private CheckerType type;
     private Circle circle = new Circle();
