@@ -31,8 +31,6 @@ public class Checker extends StackPane {
     }
 
 
-
-
     public Checker(CheckerType type, int x, int y) {
         this.type = type;
         move(x, y);

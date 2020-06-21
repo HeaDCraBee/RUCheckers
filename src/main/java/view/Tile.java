@@ -10,7 +10,6 @@ public class Tile extends Rectangle {
     private Checker checker;
 
 
-
     public boolean hasChecker() {
         return checker != null;
     }

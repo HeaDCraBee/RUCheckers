@@ -1,8 +1,6 @@
 package logic;
 
 
-import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,13 +10,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import static logic.GameController.turn;
 
 
 public class ModalWindow {
 
 
-    public static void modalWindow(String text, boolean draw) {
+    public static void modalWindow(String text, boolean draw, boolean turn) {
         AnchorPane root = new AnchorPane();
         root.setPrefSize(200, 90);
 
@@ -34,9 +31,9 @@ public class ModalWindow {
         buttonY.setLayoutY(30);
         buttonY.setFont(Font.font(20));
         buttonY.setOnMouseClicked(event -> {
-            if (draw) modalWindowResult(true);
+            if (draw) modalWindowResult(true, turn);
             else
-                modalWindowResult(false);
+                modalWindowResult(false, turn);
         });
 
         Button buttonN = new Button("NO");
@@ -54,7 +51,7 @@ public class ModalWindow {
         window.show();
     }
 
-    public static void modalWindowResult(boolean toDraw) {
+    public static void modalWindowResult(boolean toDraw, boolean turn) {
         Stage window = new Stage();
         window.initModality(Modality.APPLICATION_MODAL);
         window.initStyle(StageStyle.UNDECORATED);
