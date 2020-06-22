@@ -6,7 +6,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import static model.Model.TILE_SIZE;
 
-
 public class Checker extends StackPane {
     private CheckerType type;
     private Circle circle = new Circle();
@@ -29,7 +28,6 @@ public class Checker extends StackPane {
     public double getOldY() {
         return oldY;
     }
-
 
     public Checker(CheckerType type, int x, int y) {
         this.type = type;

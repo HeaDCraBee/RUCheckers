@@ -17,8 +17,8 @@ import model.Model;
 import view.*;
 import view.Tile;
 
+import static javafx.application.Platform.exit;
 import static model.Model.*;
-
 
 public class Main extends Application {
 
@@ -150,9 +150,5 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         Application.launch(args);
-    }
-
-    public void exit(){
-        System.exit(0);
     }
 }

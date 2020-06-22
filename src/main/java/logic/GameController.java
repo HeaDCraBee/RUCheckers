@@ -1,6 +1,5 @@
 package logic;
 
-
 import javafx.scene.text.Text;
 import model.MoveResult;
 import model.MoveType;
@@ -8,7 +7,6 @@ import model.CheckerType;
 import view.Checker;
 import view.Tile;
 import javafx.scene.Group;
-
 
 import static logic.ModalWindow.modalWindowResult;
 import static model.Model.*;

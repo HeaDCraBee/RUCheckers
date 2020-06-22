@@ -1,6 +1,5 @@
 package logic;
 
-
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -10,10 +9,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-
-
 public class ModalWindow {
-
 
     public static void modalWindow(String text, boolean draw, boolean turn) {
         AnchorPane root = new AnchorPane();

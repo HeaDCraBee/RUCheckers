@@ -1,8 +1,6 @@
-import javafx.scene.text.Text;
 import logic.GameController;
 import logic.Main;
 import model.CheckerType;
-import model.Model;
 
 import model.MoveResult;
 import model.MoveType;
@@ -11,7 +9,6 @@ import view.Checker;
 import view.Tile;
 
 import static org.junit.Assert.*;
-
 
 public class Tests {
 

@@ -14,7 +14,6 @@ public class Model {
     private Group checkerGroup = new Group();
     private Tile[][] board = new Tile[WIDTH][HEIGHT];
 
-
     public Group getTileGroup(){
         return tileGroup;
     }

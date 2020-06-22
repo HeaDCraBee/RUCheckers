@@ -4,11 +4,9 @@ import model.Model;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-
 public class Tile extends Rectangle {
 
     private Checker checker;
-
 
     public boolean hasChecker() {
         return checker != null;
@@ -30,5 +28,4 @@ public class Tile extends Rectangle {
 
         setFill(light ? Color.valueOf("#141313") : Color.valueOf("#dadfe4"));
     }
-
 }
