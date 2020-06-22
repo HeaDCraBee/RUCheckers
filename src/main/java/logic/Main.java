@@ -37,8 +37,8 @@ public class Main extends Application {
         return game;
     }
 
-    public Model getMainModel(){
-        return model;
+    public Tile[][] getMainBoard(){
+        return board;
     }
 
     //Построение сцены

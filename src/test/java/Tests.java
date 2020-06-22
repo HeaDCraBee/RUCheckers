@@ -10,8 +10,6 @@ import org.junit.Test;
 import view.Checker;
 import view.Tile;
 
-
-
 import static org.junit.Assert.*;
 
 
@@ -21,9 +19,8 @@ public class Tests {
     public void test() {
         Main main = new Main();
         main.createScene();
-        Model model = main.getMainModel();
         GameController game = main.getGame();
-        Tile[][] board = model.getBoard();
+        Tile[][] board = main.getMainBoard();
         assertTrue(board[0][1].hasChecker());
         assertFalse(board[0][0].hasChecker());
         Checker checker1 = new Checker(CheckerType.BLACK, 2, 3);
