@@ -1,12 +1,16 @@
 package logic;
 
 import javafx.scene.text.Text;
+import javafx.util.Pair;
 import model.MoveResult;
 import model.MoveType;
 import model.CheckerType;
 import view.Checker;
 import view.Tile;
 import javafx.scene.Group;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static logic.ModalWindow.modalWindowResult;
 import static model.Model.*;
@@ -42,7 +46,7 @@ public class GameController {
         return turn;
     }
 
-    public void setTurn(boolean turn){
+    public void setTurn(boolean turn) {
         this.turn = turn;
     }
 
@@ -54,10 +58,13 @@ public class GameController {
     // Постановка и перестановка шашек
     public Checker makeChecker(CheckerType type, int x, int y) {
         Checker checker = new Checker(type, x, y);
+        ArrayList<Checker> killedInRound = new ArrayList<>();
+
 
         checker.setOnMouseReleased(e -> {
             int newX = onBoard(checker.getLayoutX());
             int newY = onBoard(checker.getLayoutY());
+
             MoveResult result;
             if (checker.getLayoutX() > 800 || checker.getLayoutY() > 700) {
                 checker.abortMove();
@@ -69,117 +76,70 @@ public class GameController {
 
             int x0 = onBoard(checker.getOldX());
             int y0 = onBoard(checker.getOldY());
-
-            // При постановке шашки до дамочного поля
-            if (newY < 7 && newY > 0) {
-                switch (result.getType()) {
-                    case NONE:
-                        checker.abortMove();
-                        break;
-                    case NORMAL:
-                        checker.move(newX, newY);
-                        board[x0][y0].setChecker(null);
-                        board[newX][newY].setChecker(checker);
-                        checkWin();
-                        turn = !turn;
-                        player.setText(turn? "WHITE" : "BLACK");
-                        break;
-                    case KILL:
-                        checker.move(newX, newY);
-                        board[x0][y0].setChecker(null);
-                        board[newX][newY].setChecker(checker);
-                        Checker otherChecker = board[xKilled][yKilled].getChecker();
-                        board[onBoard(otherChecker.getOldX())][onBoard(otherChecker.getOldY())].setChecker(null);
-                        switch (otherChecker.getType()) {
-                            case WHITE:
-                                killedWhite ++;
-                                break;
-                            case WHITESTAIN:
-                                killedWhiteStain ++;
-                                break;
-                            case BLACK:
-                                killedBlack ++;
-                                break;
-                            case BLACKSTAIN:
-                                killedBlackStain ++;
+            switch (result.getType()) {
+                case NONE:
+                    checker.abortMove();
+                    break;
+                case NORMAL:
+                    checker.move(newX, newY);
+                    board[x0][y0].setChecker(null);
+                    board[newX][newY].setChecker(checker);
+                    if (checker.getType() == CheckerType.WHITE && newY == 0) {
+                        checker.stroke();
+                        checker.setType(CheckerType.WHITESTAIN);
+                    } else if (checker.getType() == CheckerType.BLACK && newY == 7) {
+                        checker.stroke();
+                        checker.setType(CheckerType.BLACKSTAIN);
+                    }
+                    checkWin();
+                    turn = !turn;
+                    player.setText(turn ? "WHITE" : "BLACK");
+                    break;
+                case KILL:
+                    checker.move(newX, newY);
+                    board[x0][y0].setChecker(null);
+                    board[newX][newY].setChecker(checker);
+                    if (checker.getType() == CheckerType.WHITE && newY == 0) {
+                        checker.stroke();
+                        checker.setType(CheckerType.WHITESTAIN);
+                    } else if (checker.getType() == CheckerType.BLACK && newY == 7) {
+                        checker.stroke();
+                        checker.setType(CheckerType.BLACKSTAIN);
+                    }
+                    Checker otherChecker = board[xKilled][yKilled].getChecker();
+                    killedInRound.add(otherChecker);
+                    board[onBoard(otherChecker.getOldX())][onBoard(otherChecker.getOldY())].setChecker(null);
+                    switch (otherChecker.getType()) {
+                        case WHITE:
+                            killedWhite++;
+                            break;
+                        case WHITESTAIN:
+                            killedWhiteStain++;
+                            break;
+                        case BLACK:
+                            killedBlack++;
+                            break;
+                        case BLACKSTAIN:
+                            killedBlackStain++;
+                    }
+                    if (checkForKill(checker, newX, newY) == 0) {
+                        for (Checker checker1 : killedInRound) {
+                            checkerGroup.getChildren().remove(checker1);
                         }
                         whiteKilled.setText(killedWhite + "/" + killedWhiteStain);
                         blackKilled.setText(killedBlack + "/" + killedBlackStain);
-                        checkerGroup.getChildren().remove(otherChecker);
-                        if (checkForKill(checker, newX, newY) == 0) {
-                            checkWin();
-                            turn = !turn;
-                            player.setText(turn? "WHITE" : "BLACK");
-                        }
-                        break;
-                }
-            } else
-                // При постановке на дамочное поле
-                if (newY == 7 || newY == 0) {
-                    switch (result.getType()) {
-                        case NONE:
-                            checker.abortMove();
-                            break;
-                        case NORMAL:
-                            checker.move(newX, newY);
-                            board[x0][y0].setChecker(null);
-                            if (checker.getType() == CheckerType.WHITE && newY == 0) {
-                                checker.stroke();
-                                checker.setType(CheckerType.WHITESTAIN);
-                            }
-                            if (checker.getType() == CheckerType.BLACK && newY == 7) {
-                                checker.stroke();
-                                checker.setType(CheckerType.BLACKSTAIN);
-                            }
-                            board[newX][newY].setChecker(checker);
-                            checkWin();
-                            turn = !turn;
-                            player.setText(turn? "WHITE" : "BLACK");
-                            break;
-                        case KILL:
-                            checker.move(newX, newY);
-                            board[x0][y0].setChecker(null);
-                            if (checker.getType() == CheckerType.WHITE) {
-                                checker.stroke();
-                                checker.setType(CheckerType.WHITESTAIN);
-                            }
-                            if (checker.getType() == CheckerType.BLACK) {
-                                checker.stroke();
-                                checker.setType(CheckerType.BLACKSTAIN);
-                            }
-                            board[newX][newY].setChecker(checker);
-                            Checker otherChecker = board[xKilled][yKilled].getChecker();
-                            switch (otherChecker.getType()) {
-                                case WHITE:
-                                    killedWhite ++;
-                                    break;
-                                case WHITESTAIN:
-                                    killedWhiteStain ++;
-                                    break;
-                                case BLACK:
-                                    killedBlack ++;
-                                    break;
-                                case BLACKSTAIN:
-                                    killedBlackStain ++;
-                            }
-                            whiteKilled.setText(killedWhite + "/" + killedWhiteStain);
-                            blackKilled.setText(killedBlack + "/" + killedBlackStain);
-                            board[onBoard(otherChecker.getOldX())][onBoard(otherChecker.getOldY())].setChecker(null);
-                            checkerGroup.getChildren().remove(otherChecker);
-                            if (checkForKill(checker, newX, newY) == 0) {
-                                checkWin();
-                                turn = !turn;
-                                player.setText(turn? "WHITE" : "BLACK");
-                            }
-                            break;
+                        checkWin();
+                        turn = !turn;
+                        player.setText(turn ? "WHITE" : "BLACK");
                     }
-                }
+                    break;
+            }
         });
         return checker;
     }
 
     //проверка хода
-    public  MoveResult tryMove(Checker checker, int newX, int newY) {
+    public MoveResult tryMove(Checker checker, int newX, int newY) {
         int x0 = onBoard(checker.getOldX());
         int y0 = onBoard(checker.getOldY());
 
@@ -217,9 +177,7 @@ public class GameController {
                 else {
                     return new MoveResult(MoveType.NORMAL);
                 }
-
             }
-
         }
     }
 
@@ -232,7 +190,7 @@ public class GameController {
 
         //Проверка диагоналей для обычных шашек
         if (checker.getType() == CheckerType.BLACK || checker.getType() == CheckerType.WHITE) {
-            if (checkChecker(x0 - 2, y0 - 2) && !board[x0 - 2][y0 - 2].hasChecker() &&
+            if (x0 - 2 > -1 && y0 - 2 > -1 && !board[x0 - 2][y0 - 2].hasChecker() &&
                     board[x0 - 1][y0 - 1].hasChecker() && checkCheckersType(x0 - 1, y0 - 1)) {//Левая-верхняя
                 isMustKill = true;
                 if (newX == x0 - 2 && newY == y0 - 2) {
@@ -242,7 +200,7 @@ public class GameController {
                 }
             }
 
-            if (checkChecker(x0 - 2, y0 + 2) && !board[x0 - 2][y0 + 2].hasChecker() &&
+            if (x0 - 2 > -1 && y0 + 2 < 8 && !board[x0 - 2][y0 + 2].hasChecker() &&
                     board[x0 - 1][y0 + 1].hasChecker() && checkCheckersType(x0 - 1, y0 + 1)) {//Левая-нижняя
                 isMustKill = true;
                 if (newX == x0 - 2 && newY == y0 + 2) {
@@ -252,7 +210,7 @@ public class GameController {
                 }
             }
 
-            if (checkChecker(x0 + 2, y0 - 2) && !board[x0 + 2][y0 - 2].hasChecker() &&
+            if (x0 + 2 < 8 && y0 - 2 > -1 && !board[x0 + 2][y0 - 2].hasChecker() &&
                     board[x0 + 1][y0 - 1].hasChecker() && checkCheckersType(x0 + 1, y0 - 1)) {//Правая-верхняя
                 isMustKill = true;
                 if (newX == x0 + 2 && newY == y0 - 2) {
@@ -262,7 +220,7 @@ public class GameController {
                 }
             }
 
-            if (checkChecker(x0 + 2, y0 + 2) && !board[x0 + 2][y0 + 2].hasChecker() &&
+            if (x0 + 2 < 8 && y0 + 2 < 8 && !board[x0 + 2][y0 + 2].hasChecker() &&
                     board[x0 + 1][y0 + 1].hasChecker() && checkCheckersType(x0 + 1, y0 + 1)) {//Правая-нижняя
                 isMustKill = true;
                 if (newX == x0 + 2 && newY == y0 + 2) {
@@ -272,57 +230,85 @@ public class GameController {
                 }
             }
         } else {
-            //Левая половина для дамки
-            int i = x0;
-            while (i > 0) {
-                if (checkChecker(x0 - i, y0 - i) && !board[x0 - i][y0 - i].hasChecker() &&
-                        board[x0 - i + 1][y0 - i + 1].hasChecker() && checkCheckersType(x0 - i + 1, y0 - i + 1) &&
-                        checkAnotherChecker(x0, y0, x0 - i + 1, false, false)) {//Сверху
-                    isMustKill = true;
-                    if (newX <= x0 - i && newY <= y0 - i) {
-                        isTryKill = true;
-                        xKilled = x0 - i + 1;
-                        yKilled = y0 - i + 1;
-                    }
+            int i = 1;
+            //Для дамки
+            while (i < 8) {
+                //Левая половина
+                if (x0 - i > 0 && y0 - i > 0) {
+                    if (board[x0 - i][y0 - i].hasChecker() &&
+                            !board[x0 - i - 1][y0 - i - 1].hasChecker() && checkCheckersType(x0 - i, y0 - i)) {//Сверху
+                        isMustKill = true;
+                        Pair<Integer, Integer> next = findNextChecker(x0, y0, x0 - i, y0 - i, false, false);
+                        if (newX < x0 - i && newY < y0 - i &&
+                                ((next.getValue() != -1 && newX > next.getKey() && newY > next.getValue()) ||
+                                        (next.getValue() == -1 && newX > -1 && newY > -1))
+                        ) {
+                            isTryKill = true;
+                            xKilled = x0 - i;
+                            yKilled = y0 - i;
+                        }
+                        break;
+                    } else if (board[x0 - i][y0 - i].hasChecker() &&
+                            board[x0 - i - 1][y0 - i - 1].hasChecker())
+                        break;
                 }
 
-                if (checkChecker(x0 - i, y0 + i) && !board[x0 - i][y0 + i].hasChecker() &&
-                        board[x0 - i + 1][y0 + i - 1].hasChecker() && checkCheckersType(x0 - i + 1, y0 + i - 1) &&
-                        checkAnotherChecker(x0, y0, x0 - i + 1, false, true)) {//Снизу
-                    isMustKill = true;
-                    if (newX <= x0 - i && newY >= y0 + i) {
-                        isTryKill = true;
-                        xKilled = x0 - i + 1;
-                        yKilled = y0 + i - 1;
-                    }
-                }
-                i--;
-            }
-            //Для правой
-            i = 7 - x0;
-            while (i > 0) {
-                if (checkChecker(x0 + i, y0 + i) && !board[x0 + i][y0 + i].hasChecker() &&
-                        board[x0 + i - 1][y0 + i - 1].hasChecker() && checkCheckersType(x0 + i - 1, y0 + i - 1) &&
-                        checkAnotherChecker(x0, y0, x0 + i - 1, true, true)) {//Снизу
-                    isMustKill = true;
-                    if (newX >= x0 + i && newY >= y0 + i) {
-                        isTryKill = true;
-                        xKilled = x0 + i - 1;
-                        yKilled = y0 + i - 1;
-                    }
+                if (x0 - i > 0 && y0 + i < 7) {
+                    if (board[x0 - i][y0 + i].hasChecker() &&
+                            !board[x0 - i - 1][y0 + i + 1].hasChecker() && checkCheckersType(x0 - i, y0 + i)) {//Снизу
+                        isMustKill = true;
+                        Pair<Integer, Integer> next = findNextChecker(x0, y0, x0 - i, y0 + i, false, true);
+                        if (newX < x0 - i && newY > y0 + i &&
+                                ((next.getValue() != -1 && newX > next.getKey() && newY < next.getValue()) ||
+                                        (next.getValue() == -1 && newX > -1 && newY < 8))) {
+                            isTryKill = true;
+                            xKilled = x0 - i;
+                            yKilled = y0 + i;
+                        }
+                        break;
+                    } else if (board[x0 - i][y0 + i].hasChecker() &&
+                            board[x0 - i - 1][y0 + i + 1].hasChecker())
+                        break;
                 }
 
-                if (checkChecker(x0 + i, y0 - i) && !board[x0 + i][y0 - i].hasChecker() &&
-                        board[x0 + i - 1][y0 - i + 1].hasChecker() && checkCheckersType(x0 + i - 1, y0 - i + 1) &&
-                        checkAnotherChecker(x0, y0, x0 + i - 1, true, false)) {//Сверху
-                    isMustKill = true;
-                    if (newX >= x0 + i && newY <= y0 - i) {
-                        isTryKill = true;
-                        xKilled = x0 + i - 1;
-                        yKilled = y0 - i + 1;
-                    }
+
+                //Правая половина
+                if (x0 + i < 7 && y0 + i < 7) {
+                    if (board[x0 + i][y0 + i].hasChecker() &&
+                            !board[x0 + i + 1][y0 + i + 1].hasChecker() && checkCheckersType(x0 + i, y0 + i)) {//Снизу
+                        isMustKill = true;
+                        Pair<Integer, Integer> next = findNextChecker(x0, y0, x0 + i, y0 + i, true, true);
+                        if (newX > x0 + i && newY > y0 + i &&
+                                ((next.getValue() != -1 && newX < next.getKey() && newY < next.getValue())
+                                        || next.getValue() == -1 && newX < 8 && newY < 8)) {//Снизу
+                            isTryKill = true;
+                            xKilled = x0 + i;
+                            yKilled = y0 + i;
+                        }
+                        break;
+                    } else if (board[x0 + i][y0 + i].hasChecker() &&
+                            board[x0 + i + 1][y0 + i + 1].hasChecker())
+                        break;
                 }
-                i--;
+
+                if (x0 + i < 7 && y0 - i > 0) {
+                    if (board[x0 + i][y0 - i].hasChecker() &&
+                            !board[x0 + i + 1][y0 - i - 1].hasChecker() && checkCheckersType(x0 + i, y0 - i)) {//Сверху
+                        isMustKill = true;
+                        Pair<Integer, Integer> next = findNextChecker(x0, y0, x0 + i, y0 - i, true, false);
+                        if (newX > x0 + i && newY < y0 - i &&
+                                ((next.getValue() != -1 && newX < next.getKey() && newY > next.getValue()) ||
+                                        (next.getValue() == -1 && newX < 8 && newY > -1))) {
+                            isTryKill = true;
+                            xKilled = x0 + i;
+                            yKilled = y0 - i;
+                        }
+                        break;
+                    } else if (board[x0 + i][y0 - i].hasChecker() &&
+                            board[x0 + i + 1][y0 - i - 1].hasChecker())
+                        break;
+                }
+                i++;
             }
         }
 
@@ -344,45 +330,32 @@ public class GameController {
             return (board[x][y].getChecker().getType() == CheckerType.WHITE || board[x][y].getChecker().getType() == CheckerType.WHITESTAIN);
     }
 
-
-    //Проверяет, есть ли на пути к шашке, другая шашка
-    private boolean checkAnotherChecker(int x0, int y0, int killX, boolean xSign, boolean ySign) {
-        int k = 0;
-        int j = y0;
-        int i = x0;
-
+    //Проверяет, есть ли на пути после взятой шашки, другая шашка
+    private Pair<Integer, Integer> findNextChecker(int x0, int y0, int xForKill, int yForKill, boolean xSign, boolean ySign) {
+        int i = 1;
+        Pair<Integer, Integer> res = new Pair<>(-1, -1);
         if (xSign) {
-            while (i < killX) {
-                if (board[i][j].hasChecker())
-                    k += 1;
-
-                i++;
+            while (x0 + i < xForKill) {
                 if (ySign)
-                    j++;
-                else
-                    j--;
+                    if (y0 + i < yForKill && board[x0 + i][y0 + i].hasChecker())
+                        return new Pair<>(x0 + i, y0 + i);
+                    else if (y0 - i > yForKill && board[x0 + i][y0 - i].hasChecker())
+                        return new Pair<>(x0 + i, y0 - i);
+                i++;
             }
         } else {
-            while (i > killX) {
-                if (board[i][j].hasChecker())
-                    k += 1;
-                i--;
-                if (ySign)
-                    j++;
-                else
-                    j--;
+            while (x0 - i > xForKill) {
+                if (ySign) {
+                    if (y0 + i < yForKill && board[x0 - i][y0 + i].hasChecker())
+                        return new Pair<>(x0 - i, y0 + i);
+                } else {
+                    if (y0 - i > -1 && board[x0 - i][y0 - i].hasChecker())
+                        return new Pair<>(x0 - i, y0 - i);
+                }
+                i++;
             }
         }
-        return k <= 1;
-    }
-
-    //Проверка существования шашке
-    private boolean checkChecker(int x, int y) {
-        try {
-            return !board[x][y].hasChecker();
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return false;
-        }
+        return res;
     }
 
     //Проверяет, может ли другая пешка бить, если ходящая шашка не бьет
@@ -448,7 +421,7 @@ public class GameController {
             modalWindowResult(true, turn);
 
         if (black + blackStain == 0 || white + whiteStain == 0) {
-            modalWindowResult(false, turn);
+            modalWindowResult(false, !turn);
         }
     }
 }

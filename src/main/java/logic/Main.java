@@ -64,7 +64,9 @@ public class Main extends Application {
                     tile.setChecker(checker);
                     checkerGroup.getChildren().add(checker);
                 }
+
             }
+
         }
         return root;
     }

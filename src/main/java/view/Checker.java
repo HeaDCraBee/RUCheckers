@@ -11,7 +11,7 @@ public class Checker extends StackPane {
     private Circle circle = new Circle();
 
     private double mouseX, mouseY;
-    private double oldX, oldY;
+    private int oldX, oldY;
 
     public CheckerType getType() {
         return type;
@@ -21,11 +21,11 @@ public class Checker extends StackPane {
         this.type = type;
     }
 
-    public double getOldX() {
+    public int getOldX() {
         return oldX;
     }
 
-    public double getOldY() {
+    public int getOldY() {
         return oldY;
     }
 
@@ -48,9 +48,7 @@ public class Checker extends StackPane {
             mouseY = e.getSceneY();
         });
 
-        setOnMouseDragged(e -> {
-            relocate(e.getSceneX() - mouseX + oldX, e.getSceneY() - mouseY + oldY);
-        });
+        setOnMouseDragged(e -> relocate(e.getSceneX() - mouseX + oldX, e.getSceneY() - mouseY + oldY));
     }
 
 
