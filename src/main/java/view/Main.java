@@ -1,4 +1,4 @@
-package logic;
+package view;
 
 import javafx.application.Application;
 
@@ -12,10 +12,9 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import logic.GameController;
 import model.CheckerType;
 import model.Model;
-import view.*;
-import view.Tile;
 
 import static javafx.application.Platform.exit;
 import static model.Model.*;

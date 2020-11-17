@@ -1,5 +1,5 @@
 import logic.GameController;
-import logic.Main;
+import view.Main;
 import model.CheckerType;
 
 import model.MoveResult;
